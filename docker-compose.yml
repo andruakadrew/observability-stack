@@ -1,0 +1,78 @@
+networks:
+  monitoring-net:
+    driver: bridge
+
+services:                      # ← Services block starts here
+  snmp-exporter:               # ← Indented 2 spaces under "services:"
+    image: prom/snmp-exporter:latest
+    container_name: snmp-exporter
+    volumes:
+      - ./snmp-exporter/config/snmp.yml:/etc/snmp_exporter/snmp.yml
+    ports:
+      - "9116:9116"
+    networks:
+      - monitoring-net
+    restart: unless-stopped
+
+  prometheus:                  # ← Indented 2 spaces (FIXED!)
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring-net
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+
+  loki:                        # ← Indented 2 spaces
+    image: grafana/loki:latest
+    container_name: loki
+    volumes:
+      - ./loki-config/loki-config.yaml:/etc/loki/loki-config.yaml
+      - loki-data:/loki
+    ports:
+      - "3100:3100"
+    networks:
+      - monitoring-net
+    command: -config.file=/etc/loki/loki-config.yaml
+    restart: unless-stopped
+
+  promtail:                    # ← Indented 2 spaces
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./promtail-config/promtail-config.yaml:/etc/promtail/promtail-config.yaml
+      - /var/log:/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "1514:1514"
+    networks:
+      - monitoring-net
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    restart: unless-stopped
+
+  grafana:                     # ← Indented 2 spaces
+    image: grafana/grafana:latest
+    container_name: grafana
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring-net
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    restart: unless-stopped
+
+volumes:                       # ← Top-level (no indentation)
+  prometheus-data:
+  loki-data:
+  grafana-data:
