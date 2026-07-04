@@ -1,2 +1,4 @@
-auth:
-  community: public 
+auths:
+  public_v2:
+    community: public
+    version: 2
