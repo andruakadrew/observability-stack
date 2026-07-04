@@ -2,8 +2,8 @@ networks:
   monitoring-net:
     driver: bridge
 
-services:                      # ← Services block starts here
-  snmp-exporter:               # ← Indented 2 spaces under "services:"
+services:                      
+  snmp-exporter:               
     image: prom/snmp-exporter:latest
     container_name: snmp-exporter
     volumes:
@@ -14,7 +14,7 @@ services:                      # ← Services block starts here
       - monitoring-net
     restart: unless-stopped
 
-  prometheus:                  # ← Indented 2 spaces (FIXED!)
+  prometheus:                  
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
@@ -29,7 +29,7 @@ services:                      # ← Services block starts here
       - '--storage.tsdb.path=/prometheus'
     restart: unless-stopped
 
-  loki:                        # ← Indented 2 spaces
+  loki:                        
     image: grafana/loki:latest
     container_name: loki
     volumes:
@@ -42,7 +42,7 @@ services:                      # ← Services block starts here
     command: -config.file=/etc/loki/loki-config.yaml
     restart: unless-stopped
 
-  promtail:                    # ← Indented 2 spaces
+  promtail:                    
     image: grafana/promtail:latest
     container_name: promtail
     volumes:
@@ -56,7 +56,7 @@ services:                      # ← Services block starts here
     command: -config.file=/etc/promtail/promtail-config.yaml
     restart: unless-stopped
 
-  grafana:                     # ← Indented 2 spaces
+  grafana:                     
     image: grafana/grafana:latest
     container_name: grafana
     volumes:
@@ -72,7 +72,7 @@ services:                      # ← Services block starts here
       - GF_SECURITY_ADMIN_PASSWORD=admin
     restart: unless-stopped
 
-volumes:                       # ← Top-level (no indentation)
+volumes:                       
   prometheus-data:
   loki-data:
   grafana-data:
